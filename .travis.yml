@@ -8,5 +8,5 @@ jobs:
       script:
         - docker build -t shu-course-proxy .
         - echo $DOCKER_PASSWORD | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - docker tag shu-volunteer $DOCKER_USERNAME/shu-course-proxy
+        - docker tag shu-course-proxy $DOCKER_USERNAME/shu-course-proxy
         - docker push $DOCKER_USERNAME/shu-course-proxy
