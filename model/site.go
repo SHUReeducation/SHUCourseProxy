@@ -2,7 +2,6 @@ package model
 
 import (
 	"SHUCourseProxy/infrastructure"
-	"github.com/hashicorp/golang-lru"
 	"net/url"
 )
 
