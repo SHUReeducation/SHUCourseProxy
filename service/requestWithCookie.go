@@ -2,7 +2,6 @@ package service
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -32,8 +31,6 @@ func PostFormWithCookieJar(urlString string, content map[string]string, jar http
 	for k, v := range content {
 		data.Add(k, v)
 	}
-	fmt.Println(urlString)
-	fmt.Println(data)
 	response, err := client.PostForm(urlString, data)
 	if err != nil {
 		return nil, err

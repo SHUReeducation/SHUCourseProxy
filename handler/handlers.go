@@ -4,7 +4,6 @@ import (
 	"SHUCourseProxy/model"
 	"SHUCourseProxy/service"
 	"encoding/json"
-	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/dgrijalva/jwt-go"
 	"io/ioutil"
@@ -29,7 +28,6 @@ func getCookieJarFromRequest(r *http.Request, url string) (http.CookieJar, error
 		return nil, err
 	}
 	jar, err := model.GetCookieJar(studentId, siteId)
-	fmt.Println(jar)
 	if err != nil {
 		return nil, err
 	}
@@ -61,6 +59,7 @@ func simulateLogin(fromURL string, studentId string, password string) http.Cooki
 	saml, _ = doc.Find("input[name=SAMLResponse]").Attr("value")
 	relay, _ = doc.Find("input[name=RelayState]").Attr("value")
 	_, _ = postWithSaml("http://oauth.shu.edu.cn/oauth/Shibboleth.sso/SAML2/POST", saml, relay, &client)
+	_, _ = client.Get(fromURL)
 	return client.Jar
 }
 

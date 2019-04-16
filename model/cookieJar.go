@@ -36,10 +36,12 @@ func GetCookieJar(studentId string, siteId int16) (http.CookieJar, error) {
 func SetCookieJar(studentId string, siteId int16, jar http.CookieJar) {
 	oathUrl, _ := url.Parse("https://oauth.shu.edu.cn/oauth/")
 	ssoUrl, _ := url.Parse("https://sso.shu.edu.cn/idp/")
+	xkUrl, _ := url.Parse("http://xk.autoisp.shu.edu.cn")
 	bytes, _ := json.Marshal(serializedJar{
 		Cookies: map[string][]*http.Cookie{
 			oathUrl.String(): jar.Cookies(oathUrl),
 			ssoUrl.String():  jar.Cookies(ssoUrl),
+			xkUrl.String():   jar.Cookies(xkUrl),
 		},
 	})
 	_, err := infrastructure.DB.Exec(`
