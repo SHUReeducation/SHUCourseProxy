@@ -42,12 +42,18 @@ func SetCookieJar(studentId string, siteId int16, jar http.CookieJar) {
 			ssoUrl.String():  jar.Cookies(ssoUrl),
 		},
 	})
-	_, _ = infrastructure.DB.Exec(`
+	_, err := infrastructure.DB.Exec(`
 	DELETE FROM cookies
 	WHERE (student_id=$1 AND site_id=$2);
 	`, studentId, siteId)
-	_, _ = infrastructure.DB.Exec(`
+	if err != nil {
+		panic(err)
+	}
+	_, err = infrastructure.DB.Exec(`
 	INSERT INTO cookies(student_id, site_id, cookie)
 			VALUES ($1,$2,$3);
 	`, studentId, siteId, bytes)
+	if err != nil {
+		panic(err)
+	}
 }

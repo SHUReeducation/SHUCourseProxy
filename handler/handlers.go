@@ -81,7 +81,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	jar := simulateLogin(input.FromUrl, input.Username, input.Password)
-	siteId, _ := model.GetOrCreateSiteIdForURL(input.FromUrl)
+	siteId, err := model.GetOrCreateSiteIdForURL(input.FromUrl)
+	if err != nil {
+		panic(err)
+	}
 	model.SetCookieJar(input.Username, siteId, jar)
 	_, _ = w.Write([]byte(service.GenerateJWT(input.Username)))
 }
