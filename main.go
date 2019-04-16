@@ -12,5 +12,6 @@ func main() {
 	http.HandleFunc("/login", handler.LoginHandler)
 	http.HandleFunc("/get", handler.GetWithCookieHandler)
 	http.HandleFunc("/post", handler.PostWithCookieHandler)
+	http.HandleFunc("/post-form", handler.PostFormWithCookieHandler)
 	_ = http.ListenAndServe(":8086", nil)
 }

@@ -139,3 +139,31 @@ func PostWithCookieHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(500)
 	}
 }
+
+func PostFormWithCookieHandler(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(500)
+		return
+	}
+	type Content struct {
+		Url     string            `json:"url"`
+		Content map[string]string `json:"content"`
+	}
+	var content Content
+	err = json.Unmarshal(body, &content)
+	if err != nil {
+		w.WriteHeader(500)
+		return
+	}
+	jar, err := getCookieJarFromRequest(r, content.Url)
+	if err != nil {
+		w.WriteHeader(403)
+		return
+	}
+	result, _ := service.PostFormWithCookieJar(content.Url, content.Content, jar)
+	_, err = w.Write(result)
+	if err != nil {
+		w.WriteHeader(500)
+	}
+}
