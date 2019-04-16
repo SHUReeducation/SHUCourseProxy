@@ -1,5 +1,5 @@
 FROM golang:1.12-alpine as builder
-RUN apk update && apk --no-cache git add ca-certificates
+RUN apk update && apk --no-cache add git ca-certificates
 ENV GO111MODULE=on
 COPY . /go/src/SHUCourseProxy
 WORKDIR /go/src/SHUCourseProxy
