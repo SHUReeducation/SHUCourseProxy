@@ -4,6 +4,7 @@ import (
 	"SHUCourseProxy/model"
 	"SHUCourseProxy/service"
 	"encoding/json"
+	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/dgrijalva/jwt-go"
 	"io/ioutil"
@@ -46,8 +47,10 @@ func simulateLogin(fromURL string, studentId string, password string) http.Cooki
 	client := http.Client{
 		Jar: jar,
 	}
+	fmt.Println(fromURL)
 	page1, _ := client.Get(fromURL)
 	doc, _ := goquery.NewDocumentFromReader(page1.Body)
+	fmt.Println(doc.Html())
 	saml, _ := doc.Find("input[name=SAMLRequest]").Attr("value")
 	relay, _ := doc.Find("input[name=RelayState]").Attr("value")
 	_, _ = postWithSaml("https://sso.shu.edu.cn/idp/profile/SAML2/POST/SSO", saml, relay, &client)
