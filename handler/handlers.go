@@ -49,6 +49,7 @@ func simulateLogin(fromURL string, studentId string, password string) http.Cooki
 	}
 	fmt.Println(fromURL)
 	page1, _ := client.Get(fromURL)
+	fmt.Println(page1)
 	body, _ := ioutil.ReadAll(page1.Body)
 	fmt.Println(string(body))
 	doc, _ := goquery.NewDocumentFromReader(page1.Body)
