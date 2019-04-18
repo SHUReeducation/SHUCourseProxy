@@ -1,5 +1,9 @@
 services:
   - docker
+
+addons:
+  ssh_known_hosts: cloud.shu.xn--io0a7i
+
 jobs:
   include:
     - stage: build
