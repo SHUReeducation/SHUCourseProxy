@@ -6,8 +6,8 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write([]byte("Hello? Am I working?"))
+	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte("pong"))
 	})
 	http.HandleFunc("/login", handler.LoginHandler)
 	http.HandleFunc("/get", handler.GetWithCookieHandler)
