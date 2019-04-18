@@ -22,4 +22,4 @@ jobs:
         - chmod 600 ./deploy_rsa
         - ssh-add ./deploy_rsa
       script:
-        - ssh -i ./deploy_rsa root@cloud.shu.xn--io0a7i ./deploy.sh course $DOCKER_USERNAME/shu-course-proxy:latest
+        - ssh -i ./deploy_rsa root@cloud.shu.xn--io0a7i ./deploy.sh course $DOCKER_USERNAME/shu-course-proxy
