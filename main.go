@@ -7,7 +7,7 @@ import (
 
 func main() {
 	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write([]byte("pong"))
+		_, _ = w.Write([]byte("pong "))
 	})
 	http.HandleFunc("/login", handler.LoginHandler)
 	http.HandleFunc("/get", handler.GetWithCookieHandler)
