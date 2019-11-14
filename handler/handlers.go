@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"SHUCourseProxy/infrastructure"
 	"SHUCourseProxy/model"
 	"SHUCourseProxy/service"
 	"encoding/json"
@@ -46,20 +47,25 @@ func simulateLogin(fromURL string, studentId string, password string) http.Cooki
 	client := http.Client{
 		Jar: jar,
 	}
-	page1, _ := client.Get(fromURL)
+	page1, err := client.Get(fromURL)
+	infrastructure.CheckErr(err, "Cannot reach site"+fromURL)
 	doc, _ := goquery.NewDocumentFromReader(page1.Body)
 	saml, _ := doc.Find("input[name=SAMLRequest]").Attr("value")
 	relay, _ := doc.Find("input[name=RelayState]").Attr("value")
-	_, _ = postWithSaml("https://sso.shu.edu.cn/idp/profile/SAML2/POST/SSO", saml, relay, &client)
-	page2, _ := client.PostForm("https://sso.shu.edu.cn/idp/Authn/UserPassword", url.Values{
+	_, err = postWithSaml("https://sso.shu.edu.cn/idp/profile/SAML2/POST/SSO", saml, relay, &client)
+	infrastructure.CheckErr(err, "SSO failed at step 1")
+	page2, err := client.PostForm("https://sso.shu.edu.cn/idp/Authn/UserPassword", url.Values{
 		"j_username": []string{studentId},
 		"j_password": []string{password},
 	})
+	infrastructure.CheckErr(err, "SSO failed at step 2")
 	doc, _ = goquery.NewDocumentFromReader(page2.Body)
 	saml, _ = doc.Find("input[name=SAMLResponse]").Attr("value")
 	relay, _ = doc.Find("input[name=RelayState]").Attr("value")
-	_, _ = postWithSaml("http://oauth.shu.edu.cn/oauth/Shibboleth.sso/SAML2/POST", saml, relay, &client)
-	_, _ = client.Get(fromURL)
+	_, err = postWithSaml("http://oauth.shu.edu.cn/oauth/Shibboleth.sso/SAML2/POST", saml, relay, &client)
+	infrastructure.CheckErr(err, "SSO failed at step 3")
+	_, err = client.Get(fromURL)
+	infrastructure.CheckErr(err, "Target site "+fromURL+" still not available")
 	return client.Jar
 }
 
@@ -77,9 +83,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	jar := simulateLogin(input.FromUrl, input.Username, input.Password)
 	siteId, err := model.GetOrCreateSiteIdForURL(input.FromUrl)
-	if err != nil {
-		panic(err)
-	}
+	infrastructure.CheckErr(err, "GetOrCreateSiteIdForURL failed")
 	model.SetCookieJar(input.Username, siteId, jar)
 	_, _ = w.Write([]byte(service.GenerateJWT(input.Username)))
 }
