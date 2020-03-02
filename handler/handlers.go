@@ -11,6 +11,7 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"os"
+	"strings"
 )
 
 func getCookieJarFromRequest(r *http.Request, url string) (http.CookieJar, error) {
@@ -54,8 +55,13 @@ func simulateLogin(fromURL string, studentId string, password string) http.Cooki
 		"login_submit": []string{"登录"},
 	})
 	infrastructure.CheckErr(err, "failed to oauth")
-	_, err = client.Get(fromURL)
+	resp, err := client.Get(fromURL)
 	infrastructure.CheckErr(err, "Target site "+fromURL+" still not available")
+	content, err := ioutil.ReadAll(resp.Body)
+	infrastructure.CheckErr(err, "Target site "+fromURL+" still not available")
+	if strings.Contains(string(content), "id=\"login-submit\"") {
+		return nil
+	}
 	return client.Jar
 }
 
@@ -72,10 +78,14 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	jar := simulateLogin(input.FromUrl, input.Username, input.Password)
-	siteId, err := model.GetOrCreateSiteIdForURL(input.FromUrl)
-	infrastructure.CheckErr(err, "GetOrCreateSiteIdForURL failed")
-	model.SetCookieJar(input.Username, siteId, jar)
-	_, _ = w.Write([]byte(service.GenerateJWT(input.Username)))
+	if jar == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+	} else {
+		siteId, err := model.GetOrCreateSiteIdForURL(input.FromUrl)
+		infrastructure.CheckErr(err, "GetOrCreateSiteIdForURL failed")
+		model.SetCookieJar(input.Username, siteId, jar)
+		_, _ = w.Write([]byte(service.GenerateJWT(input.Username)))
+	}
 }
 
 func GetWithCookieHandler(w http.ResponseWriter, r *http.Request) {
